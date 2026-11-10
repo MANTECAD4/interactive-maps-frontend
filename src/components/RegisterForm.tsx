@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -10,8 +9,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRegister } from "@/hooks/useRegister";
 
 export const RegisterForm = () => {
+  const {} = useRegister();
   return (
     <Card className="w-full max-w-75 fixed right-2.5 top-1/2 -translate-y-1/2 p-2 z-50 bg-background/80">
       <CardHeader>
@@ -25,7 +26,7 @@ export const RegisterForm = () => {
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" type="text" placeholder="Juan Pérez" required />
+              <Input type="text" placeholder="Juan Pérez" required />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="marker-color">Marker color</Label>
