@@ -18,7 +18,7 @@ export const RegisterPage = () => {
     <div className="flex items-center justify-center min-h-dvh map-wallpaper">
       <div
         className={cn(
-          "flex flex-col gap-6 max-w-sm w-full bg-background/70 p-6 rounded-xl",
+          "flex flex-col gap-6 max-w-sm w-full bg-background/70 p-6 rounded-xl ",
         )}
       >
         <form onSubmit={handleSubmit(handleSubmitForm)}>
@@ -33,7 +33,7 @@ export const RegisterPage = () => {
                 </div>
                 <span className="sr-only">Explore Earth</span>
               </a>
-              <h1 className="text-xl font-bold">Welcome to Earth.</h1>
+              <h1 className="text-xl font-bold">Register</h1>
               <FieldDescription>
                 Join other users and travel around the world
               </FieldDescription>
@@ -94,7 +94,6 @@ export const RegisterPage = () => {
             </div>
             <Field>
               <Button type="submit">Join</Button>
-              <FieldError></FieldError>
             </Field>
           </FieldGroup>
         </form>

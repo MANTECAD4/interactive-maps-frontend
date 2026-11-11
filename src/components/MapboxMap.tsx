@@ -2,9 +2,8 @@ import * as mapboxgl from "mapbox-gl/esm";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { SearchBox } from "@mapbox/search-js-react";
 import { useMap } from "@/hooks/useMap";
-function Map() {
+export const MapboxMap = () => {
   const { mapContainerRef, mapRef } = useMap();
-
   return (
     <>
       {mapRef.current && (
@@ -12,16 +11,11 @@ function Map() {
           <SearchBox
             accessToken={import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}
             map={mapRef.current}
-            //@ts-ignore
+            // @ts-ignore
             mapboxgl={mapboxgl}
             options={{
               proximity: [-103.34583950146607, 20.677395378085805],
-              // bbox: [
-              //   [-103.88048, 20.42959],
-              //   [-102.78258, 20.90861],
-              // ],
             }}
-            // marker
           />
         </div>
       )}
@@ -32,6 +26,27 @@ function Map() {
       />
     </>
   );
-}
+};
 
-export default Map;
+export default MapboxMap;
+{
+  /* <button
+        onClick={() => {
+          handleAddClient(
+            {
+              id: crypto.randomUUID(),
+              name: "nanel",
+              coordinates: {
+                lon: -103.34583950146607,
+                lat: 20.677395378085805,
+              },
+              color: "red",
+              updatedAt: new Date(),
+            },
+            mapRef,
+          );
+        }}
+      >
+        add client
+      </button> */
+}

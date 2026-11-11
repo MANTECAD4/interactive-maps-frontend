@@ -1,4 +1,4 @@
-import Map from "@/components/Map";
+import { MapboxMap } from "@/components/MapboxMap";
 import { MarkerInfo } from "@/components/MarkerInfo";
 
 export const MapPage = () => {
@@ -7,7 +7,7 @@ export const MapPage = () => {
       {/* <MapControls /> */}
       <MarkerInfo />
       {/* <RegisterForm /> */}
-      <Map />
+      <MapboxMap />
     </main>
   );
 };

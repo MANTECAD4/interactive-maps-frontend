@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef } from "react";
 import * as mapboxgl from "mapbox-gl/esm";
+import { MapClientsContext } from "@/context/MapClientsContext";
 
 export const useMap = () => {
-  const mapRef = useRef<mapboxgl.Map>(null);
+  const { mapRef, setIsMapLoaded, isMapLoaded, hostMarker } =
+    use(MapClientsContext);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [_isLoaded, setIsLoaded] = useState(false);
+
+  // Initialize map on mount
   useEffect(() => {
     if (!mapContainerRef.current) return;
     mapRef.current = new mapboxgl.Map({
@@ -15,8 +18,7 @@ export const useMap = () => {
       // style: "mapbox://styles/nanelmtzz/cmw44ercd01q001qp39cxdnt5",
     });
     mapRef.current.on("load", () => {
-      // console.log("Map ready!");
-      setIsLoaded(true);
+      setIsMapLoaded(true);
     });
     mapRef.current.addControl(new mapboxgl.NavigationControl(), {
       position: "bottom-right",
@@ -28,6 +30,21 @@ export const useMap = () => {
       }
     };
   }, []);
+
+  // If host marker & map are set, adds a new marker for host
+  useEffect(() => {
+    if (!isMapLoaded || !hostMarker || !mapRef.current) return;
+
+    const marker = new mapboxgl.Marker({
+      draggable: true,
+    })
+      .setLngLat([hostMarker.coordinates.lon, hostMarker.coordinates.lat])
+      .addTo(mapRef.current);
+
+    marker.on("drag", () => {
+      console.log({ coords: marker.getLngLat() });
+    });
+  }, [hostMarker, isMapLoaded, mapRef]);
 
   return {
     mapContainerRef,
