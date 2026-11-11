@@ -35,11 +35,10 @@ export const WebSocketContext = createContext<WebSocketContextState>(
 );
 
 export const WebSocketProvider: FC<Props> = ({ children, url }) => {
+  const [socket, setSocket] = useState<WebSocket | null>(null);
   const [status, setStatus] = useState<WebSocketStatus>(
     WebSocketStatus.Disconnected,
   );
-
-  const [socket, setSocket] = useState<WebSocket | null>(null);
 
   const sendMessage = (request: WebSocketRequestMessage) => {
     if (!socket) {

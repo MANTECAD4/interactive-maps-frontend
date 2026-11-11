@@ -1,11 +1,15 @@
 import { use, useEffect, useRef } from "react";
 import * as mapboxgl from "mapbox-gl/esm";
 import { MapClientsContext } from "@/context/MapClientsContext";
+import { WebSocketContext } from "@/websockets/WebSocketProvider";
+import { RequestMessage } from "@/dtos/requests.dtos";
 
 export const useMap = () => {
-  const { mapRef, setIsMapLoaded, isMapLoaded, hostMarker } =
+  const { mapRef, setIsMapLoaded, isMapLoaded, hostMarker, setHostMarker } =
     use(MapClientsContext);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+
+  const { sendMessage } = use(WebSocketContext);
 
   // Initialize map on mount
   useEffect(() => {
@@ -35,14 +39,35 @@ export const useMap = () => {
   useEffect(() => {
     if (!isMapLoaded || !hostMarker || !mapRef.current) return;
 
+    const popup = new mapboxgl.Popup().setHTML(`<p>${hostMarker.name}</p>`);
+
     const marker = new mapboxgl.Marker({
       draggable: true,
+      color: hostMarker.color,
     })
       .setLngLat([hostMarker.coordinates.lon, hostMarker.coordinates.lat])
-      .addTo(mapRef.current);
+      .addTo(mapRef.current)
+      .setPopup(popup);
 
     marker.on("drag", () => {
-      console.log({ coords: marker.getLngLat() });
+      const { lat, lng: lon } = marker.getLngLat();
+      console.log({ lat, lon });
+      sendMessage({
+        type: RequestMessage.MOVE_CLIENT,
+        payload: {
+          coordinates: {
+            lat,
+            lon,
+          },
+        },
+      });
+    });
+
+    marker.on("dragend", () => {
+      const { lng: lon, lat } = marker.getLngLat();
+      setHostMarker((prev) =>
+        prev ? { ...prev, coordinates: { lat, lon } } : null,
+      );
     });
   }, [hostMarker, isMapLoaded, mapRef]);
 

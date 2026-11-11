@@ -4,14 +4,17 @@ import type { ClientMarker, Coordinates } from "@/dtos";
 import * as mapboxgl from "mapbox-gl/esm";
 
 interface MapClientsState {
+  //! PROPERTIES
+  hostMarker: ClientMarker | null;
+  clients: React.RefObject<Map<string, mapboxgl.Marker>>;
   mapRef: React.RefObject<mapboxgl.Map | null>;
   isMapLoaded: boolean;
+
+  //! Setters
   setIsMapLoaded: React.Dispatch<React.SetStateAction<boolean>>;
-
-  clients: React.RefObject<Map<string, mapboxgl.Marker>>;
-  hostMarker: ClientMarker | null;
-
   setHostMarker: React.Dispatch<React.SetStateAction<ClientMarker | null>>;
+
+  //! Methods
   handleAddHostMarker: (id: string, marker: mapboxgl.Marker) => void;
   handleAddClient: (
     client: ClientMarker,
@@ -57,7 +60,13 @@ export const MapClientsContextProvider: FC<Props> = ({ children }) => {
   };
 
   const handleDeleteClient = (id: string) => {
+    const marker = clients.current.get(id);
+    if (!marker) {
+      console.log({ error: `Marker with id ${id} not found for deletion` });
+      return;
+    }
     clients.current.delete(id);
+    marker.remove();
   };
 
   const handleMoveClient = (id: string, coordinates: Coordinates) => {
@@ -72,16 +81,21 @@ export const MapClientsContextProvider: FC<Props> = ({ children }) => {
   return (
     <MapClientsContext
       value={{
+        //! Properties
         clients,
+        hostMarker,
+        mapRef,
         isMapLoaded,
+
+        //! Setters
+        setHostMarker,
+        setIsMapLoaded,
+
+        //! Methods
         handleAddClient,
         handleDeleteClient,
         handleMoveClient,
-        hostMarker,
         handleAddHostMarker,
-        setHostMarker,
-        setIsMapLoaded,
-        mapRef,
       }}
     >
       {children}
