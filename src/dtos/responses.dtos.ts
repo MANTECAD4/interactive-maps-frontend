@@ -6,7 +6,6 @@ export enum ResponseMessageType {
   "CLIENT_JOINED" = "CLIENT_JOINED",
   "CLIENT_LEFT" = "CLIENT_LEFT",
   "CLIENT_MOVED" = "CLIENT_MOVED",
-  "WELCOME" = "WELCOME",
   "ERROR" = "ERROR",
 }
 

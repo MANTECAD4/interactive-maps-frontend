@@ -46,7 +46,12 @@ export const WebSocketProvider: FC<Props> = ({ children, url }) => {
     WebSocketStatus.Disconnected,
   );
 
-  const { setInitialClients, handleAddClient } = use(MapClientsContext);
+  const {
+    setInitialClients,
+    handleAddClient,
+    handleDeleteClient,
+    handleMoveClient,
+  } = use(MapClientsContext);
 
   const responseHandler = (response: any) => {
     const { data: responseParsed, error } =
@@ -61,6 +66,17 @@ export const WebSocketProvider: FC<Props> = ({ children, url }) => {
       }
       case ResponseMessageType.CLIENT_JOINED: {
         handleAddClient(responseParsed.payload.clientMarker);
+        break;
+      }
+      case ResponseMessageType.CLIENT_LEFT: {
+        handleDeleteClient(responseParsed.payload.id);
+        break;
+      }
+      case ResponseMessageType.CLIENT_MOVED: {
+        handleMoveClient(
+          responseParsed.payload.id,
+          responseParsed.payload.coordinates,
+        );
         break;
       }
       default:
@@ -120,33 +136,3 @@ export const WebSocketProvider: FC<Props> = ({ children, url }) => {
     </WebSocketContext>
   );
 };
-
-// useEffect(() => {
-//   return () => {
-//     if (socket?.readyState === WebSocket.OPEN) {
-//       setSocket(null);
-//       socket.close();
-//     }
-//   };
-// }, []);
-
-// useEffect(() => {
-//   if (status !== WebSocketStatus.Disconnected) return;
-
-//   let attempts = 0;
-
-//   const interval = setInterval(() => {
-//     console.log("Reconnecting...");
-//     connect();
-//     attempts++;
-//     if (attempts >= 10) {
-//       clearInterval(interval);
-//     }
-//   }, 1000);
-
-//   return () => {
-//     if (interval) {
-//       clearInterval(interval);
-//     }
-//   };
-// }, [status, connect]);
