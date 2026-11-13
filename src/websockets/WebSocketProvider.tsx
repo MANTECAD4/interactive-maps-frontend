@@ -1,3 +1,4 @@
+import { MapClientsContext } from "@/context/MapClientsContext";
 import type { ClientMarker } from "@/dtos";
 import {
   RequestMessage,
@@ -9,6 +10,7 @@ import {
 } from "@/dtos/responses.dtos";
 import {
   createContext,
+  use,
   useCallback,
   useState,
   type FC,
@@ -44,6 +46,8 @@ export const WebSocketProvider: FC<Props> = ({ children, url }) => {
     WebSocketStatus.Disconnected,
   );
 
+  const { setInitialClients, handleAddClient } = use(MapClientsContext);
+
   const responseHandler = (response: any) => {
     const { data: responseParsed, error } =
       WebSocketResponseSchema.safeParse(response);
@@ -51,9 +55,14 @@ export const WebSocketProvider: FC<Props> = ({ children, url }) => {
       throw new Error(`Invalid response: ${z.prettifyError(error)}`);
     }
     switch (responseParsed.type) {
-      case ResponseMessageType.CLIENT_MARKERS_LIST:
-        console.log({ markers: responseParsed.payload });
+      case ResponseMessageType.CLIENT_MARKERS_LIST: {
+        setInitialClients(responseParsed.payload.clientMarkers);
         break;
+      }
+      case ResponseMessageType.CLIENT_JOINED: {
+        handleAddClient(responseParsed.payload.clientMarker);
+        break;
+      }
       default:
         throw new Error(`Response type:${responseParsed.type} not identified`);
     }

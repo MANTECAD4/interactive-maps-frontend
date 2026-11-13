@@ -17,10 +17,7 @@ interface MapClientsState {
   //! Methods
   setInitialClients: (clientMarkers: ClientMarker[]) => void;
   addHostMarker: (hostInfo: ClientMarker) => void;
-  handleAddClient: (
-    client: ClientMarker,
-    map: React.RefObject<mapboxgl.Map | null>,
-  ) => void;
+  handleAddClient: (client: ClientMarker) => void;
   getHostMarker: () => undefined | mapboxgl.Marker;
   handleDeleteClient: (id: string) => void;
   handleMoveClient: (id: string, coordinates: Coordinates) => void;
@@ -90,10 +87,7 @@ export const MapClientsContextProvider: FC<Props> = ({ children }) => {
     clients.current.clear();
   };
 
-  const handleAddClient = (
-    client: ClientMarker,
-    mapRef: React.RefObject<mapboxgl.Map | null>,
-  ) => {
+  const handleAddClient = (client: ClientMarker) => {
     if (!mapRef.current) {
       console.error({ error: "Map not initialized" });
       return;
