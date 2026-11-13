@@ -1,6 +1,7 @@
-import type { ClientMarker, Coordinates } from "@/dtos";
+import { ClientMarkerSchema, CoordinatesSchema } from "@/dtos";
+import z from "zod";
 
-export enum ResponseMessage {
+export enum ResponseMessageType {
   "CLIENT_MARKERS_LIST" = "CLIENT_MARKERS_LIST",
   "CLIENT_JOINED" = "CLIENT_JOINED",
   "CLIENT_LEFT" = "CLIENT_LEFT",
@@ -9,37 +10,44 @@ export enum ResponseMessage {
   "ERROR" = "ERROR",
 }
 
-export interface WebSocketResponse {
-  personal: WebSocketResponseMessage[];
-  broadcast: WebSocketResponseMessage[];
-}
+export const WelcomeSchema = z.object({
+  clientMarker: ClientMarkerSchema,
+});
+export const ClientMarkersListSchema = z.object({
+  clientMarkers: z.array(ClientMarkerSchema),
+});
+export const ClientJoinedSchema = z.object({
+  clientMarker: ClientMarkerSchema,
+});
+export const ClientLeftSchema = z.object({
+  id: z.string(),
+});
+export const ClientMovedSchema = z.object({
+  id: z.string(),
+  coordinates: CoordinatesSchema,
+  updatedAt: z.coerce.date(),
+});
 
-export type WebSocketResponseMessage =
-  | {
-      type: ResponseMessage.ERROR;
-      error: {
-        message: string;
-      };
-    }
-  | {
-      type: ResponseMessage.WELCOME;
-      payload: {
-        clientMarker: ClientMarker;
-      };
-    }
-  | {
-      type: ResponseMessage.CLIENT_MARKERS_LIST;
-      payload: { clientMarkers: ClientMarker[] };
-    }
-  | {
-      type: ResponseMessage.CLIENT_JOINED;
-      payload: { clientMarker: ClientMarker };
-    }
-  | {
-      type: ResponseMessage.CLIENT_LEFT;
-      payload: { id: string };
-    }
-  | {
-      type: ResponseMessage.CLIENT_MOVED;
-      payload: { id: string; coordinates: Coordinates; updatedAt: Date };
-    };
+export const WebSocketResponseSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal(ResponseMessageType.ERROR),
+    message: z.string(),
+  }),
+
+  z.object({
+    type: z.literal(ResponseMessageType.CLIENT_MARKERS_LIST),
+    payload: ClientMarkersListSchema,
+  }),
+  z.object({
+    type: z.literal(ResponseMessageType.CLIENT_JOINED),
+    payload: ClientJoinedSchema,
+  }),
+  z.object({
+    type: z.literal(ResponseMessageType.CLIENT_LEFT),
+    payload: ClientLeftSchema,
+  }),
+  z.object({
+    type: z.literal(ResponseMessageType.CLIENT_MOVED),
+    payload: ClientMovedSchema,
+  }),
+]);

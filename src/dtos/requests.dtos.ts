@@ -15,13 +15,7 @@ export const SubmitClientSchema = z.object({
   longitude: z.coerce.number().min(-180).max(180),
 });
 
-export const RegisterClientSchema = ClientMarkerSchema.omit({
-  id: true,
-  updatedAt: true,
-});
-
 export const MoveClientSchema = ClientMarkerSchema.omit({
-  updatedAt: true,
   color: true,
   name: true,
   id: true,
@@ -38,7 +32,7 @@ export const WebSocketRequestSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal(RequestMessage.REGISTER_CLIENT),
-    payload: RegisterClientSchema,
+    payload: ClientMarkerSchema,
   }),
   z.object({
     type: z.literal(RequestMessage.MOVE_CLIENT),
@@ -53,7 +47,6 @@ export const WebSocketRequestSchema = z.discriminatedUnion("type", [
 export type WebSocketRequestMessage = z.infer<typeof WebSocketRequestSchema>;
 
 export type SubmitRegisterClientDto = z.infer<typeof SubmitClientSchema>;
-export type RegisterClientDto = z.infer<typeof RegisterClientSchema>;
 export type MoveClientDto = z.infer<typeof MoveClientSchema>;
 // export type DeleteClientDto = z.infer<typeof WithIdSchema>;
 // export type WithIdDto = z.infer<typeof WithIdSchema>;

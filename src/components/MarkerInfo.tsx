@@ -6,7 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { MapClientsContext } from "@/context/MapClientsContext";
+import { use } from "react";
 export const MarkerInfo = () => {
+  const { hostInfo } = use(MapClientsContext);
   return (
     <div className="group/stamp w-full max-w-55  fixed right-3 top-3  p-3 z-50 stamp">
       <div className="p-1 bg-background">
@@ -29,7 +32,9 @@ export const MarkerInfo = () => {
               <div className="flex gap-1 items-center">
                 <div className="text-[0.68rem]">
                   <p className="">Coordinates:</p>
-                  <p className="">-32.435534543, 40.43252534543</p>
+                  <p className="">
+                    {hostInfo?.coordinates.lon}, {hostInfo?.coordinates.lat}
+                  </p>
                 </div>
               </div>
             </CardContent>

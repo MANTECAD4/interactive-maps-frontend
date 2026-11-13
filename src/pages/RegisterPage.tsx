@@ -69,8 +69,9 @@ export const RegisterPage = () => {
                 <Input
                   {...register("latitude")}
                   type="number"
-                  min={-85}
-                  max={85}
+                  step="any"
+                  min={-90}
+                  max={90}
                   required
                   aria-invalid={Boolean(errors.latitude)}
                 />
@@ -84,6 +85,7 @@ export const RegisterPage = () => {
                 <Input
                   {...register("longitude")}
                   type="number"
+                  step="any"
                   min={-180}
                   max={180}
                   required

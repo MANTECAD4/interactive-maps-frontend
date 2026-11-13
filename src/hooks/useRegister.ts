@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { use } from "react";
 import { WebSocketContext } from "@/websockets/WebSocketProvider";
+import { MapClientsContext } from "@/context/MapClientsContext";
+import type { ClientMarker } from "@/dtos";
 export const useRegister = () => {
   const {
     register,
@@ -21,6 +23,7 @@ export const useRegister = () => {
   });
 
   const { connect } = use(WebSocketContext);
+  const { addHostMarker } = use(MapClientsContext);
 
   const handleSubmitForm: SubmitHandler<SubmitRegisterClientDto> = ({
     color,
@@ -28,7 +31,15 @@ export const useRegister = () => {
     longitude,
     name,
   }) => {
-    connect({ name, color, coordinates: { lat: latitude, lon: longitude } });
+    const hostInfo: ClientMarker = {
+      id: crypto.randomUUID(),
+      name,
+      coordinates: { lat: latitude, lon: longitude },
+      color,
+      updatedAt: new Date(),
+    };
+    addHostMarker(hostInfo);
+    connect(hostInfo);
   };
   return { register, errors, handleSubmit, handleSubmitForm };
 };

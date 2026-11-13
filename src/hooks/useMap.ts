@@ -5,11 +5,12 @@ import { WebSocketContext } from "@/websockets/WebSocketProvider";
 import { RequestMessage } from "@/dtos/requests.dtos";
 
 export const useMap = () => {
-  const { mapRef, setIsMapLoaded, isMapLoaded, hostMarker, setHostMarker } =
-    use(MapClientsContext);
+  const { mapRef, setIsMapLoaded } = use(MapClientsContext);
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   const { sendMessage } = use(WebSocketContext);
+  const { getHostMarker, setHostInfo, linkClientMarkersToMap } =
+    use(MapClientsContext);
 
   // Initialize map on mount
   useEffect(() => {
@@ -23,6 +24,32 @@ export const useMap = () => {
     });
     mapRef.current.on("load", () => {
       setIsMapLoaded(true);
+      const hostMarker = getHostMarker();
+      if (!hostMarker) {
+        console.log({ error: "host marker not found on map on load" });
+        return;
+      }
+      hostMarker.on("drag", () => {
+        const { lat, lng: lon } = hostMarker.getLngLat();
+        sendMessage({
+          type: RequestMessage.MOVE_CLIENT,
+          payload: {
+            coordinates: {
+              lat,
+              lon,
+            },
+            updatedAt: new Date(),
+          },
+        });
+      });
+
+      hostMarker.on("dragend", () => {
+        const { lng: lon, lat } = hostMarker.getLngLat();
+        setHostInfo((prev) =>
+          prev ? { ...prev, coordinates: { lat, lon } } : null,
+        );
+      });
+      linkClientMarkersToMap();
     });
     mapRef.current.addControl(new mapboxgl.NavigationControl(), {
       position: "bottom-right",
@@ -36,40 +63,41 @@ export const useMap = () => {
   }, []);
 
   // If host marker & map are set, adds a new marker for host
-  useEffect(() => {
-    if (!isMapLoaded || !hostMarker || !mapRef.current) return;
 
-    const popup = new mapboxgl.Popup().setHTML(`<p>${hostMarker.name}</p>`);
+  // useEffect(() => {
+  //   if (!isMapLoaded || !hostMarker || !mapRef.current) return;
 
-    const marker = new mapboxgl.Marker({
-      draggable: true,
-      color: hostMarker.color,
-    })
-      .setLngLat([hostMarker.coordinates.lon, hostMarker.coordinates.lat])
-      .addTo(mapRef.current)
-      .setPopup(popup);
+  //   const popup = new mapboxgl.Popup().setHTML(`<p>${hostMarker.name}</p>`);
 
-    marker.on("drag", () => {
-      const { lat, lng: lon } = marker.getLngLat();
-      console.log({ lat, lon });
-      sendMessage({
-        type: RequestMessage.MOVE_CLIENT,
-        payload: {
-          coordinates: {
-            lat,
-            lon,
-          },
-        },
-      });
-    });
+  //   const marker = new mapboxgl.Marker({
+  //     draggable: true,
+  //     color: hostMarker.color,
+  //   })
+  //     .setLngLat([hostMarker.coordinates.lon, hostMarker.coordinates.lat])
+  //     .addTo(mapRef.current)
+  //     .setPopup(popup);
 
-    marker.on("dragend", () => {
-      const { lng: lon, lat } = marker.getLngLat();
-      setHostMarker((prev) =>
-        prev ? { ...prev, coordinates: { lat, lon } } : null,
-      );
-    });
-  }, [hostMarker, isMapLoaded, mapRef]);
+  //   marker.on("drag", () => {
+  //     const { lat, lng: lon } = marker.getLngLat();
+  //     console.log({ lat, lon });
+  //     sendMessage({
+  //       type: RequestMessage.MOVE_CLIENT,
+  //       payload: {
+  //         coordinates: {
+  //           lat,
+  //           lon,
+  //         },
+  //       },
+  //     });
+  //   });
+
+  //   marker.on("dragend", () => {
+  //     const { lng: lon, lat } = marker.getLngLat();
+  //     setHostInfo((prev) =>
+  //       prev ? { ...prev, coordinates: { lat, lon } } : null,
+  //     );
+  //   });
+  // }, [hostMarker, isMapLoaded]);
 
   return {
     mapContainerRef,
