@@ -9,17 +9,22 @@ export const useMap = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   const { sendMessage } = use(WebSocketContext);
-  const { getHostMarker, setHostInfo, linkClientMarkersToMap } =
-    use(MapClientsContext);
+  const {
+    getHostMarker,
+    setHostInfo,
+    linkClientMarkersToMap,
+    getHostCoordinates,
+  } = use(MapClientsContext);
 
   // Initialize map on mount
   useEffect(() => {
     if (!mapContainerRef.current) return;
+    const { lat, lon } = getHostCoordinates()!;
     mapRef.current = new mapboxgl.Map({
       accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
       container: mapContainerRef.current,
-      center: [-103.34583950146607, 20.677395378085805], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-      zoom: 13, // starting zoom
+      center: [lon, lat],
+      // center: [-103.34583950146607, 20.677395378085805],
       // style: "mapbox://styles/nanelmtzz/cmw44ercd01q001qp39cxdnt5",
     });
     mapRef.current.on("load", () => {

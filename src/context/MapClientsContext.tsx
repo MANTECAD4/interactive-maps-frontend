@@ -22,6 +22,7 @@ interface MapClientsState {
   handleDeleteClient: (id: string) => void;
   handleMoveClient: (id: string, coordinates: Coordinates) => void;
   clearState: () => void;
+  getHostCoordinates: () => Coordinates | undefined;
   linkClientMarkersToMap: () => void;
 }
 
@@ -84,7 +85,16 @@ export const MapClientsContextProvider: FC<Props> = ({ children }) => {
   const clearState = () => {
     setIsMapLoaded(false);
     setHostInfo(null);
+    clients.current.forEach((clientMarker) => clientMarker.remove());
     clients.current.clear();
+  };
+
+  const getHostCoordinates = () => {
+    if (!hostInfo) {
+      console.log({ error: "Initial coordinates not found" });
+      return;
+    }
+    return hostInfo.coordinates;
   };
 
   const handleAddClient = (client: ClientMarker) => {
@@ -135,6 +145,7 @@ export const MapClientsContextProvider: FC<Props> = ({ children }) => {
 
         //! Methods
         getHostMarker,
+        getHostCoordinates,
         clearState,
         setInitialClients,
         handleAddClient,

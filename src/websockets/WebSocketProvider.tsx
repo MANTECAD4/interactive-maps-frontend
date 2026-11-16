@@ -12,6 +12,7 @@ import {
   createContext,
   use,
   useCallback,
+  useRef,
   useState,
   type FC,
   type ReactNode,
@@ -41,7 +42,7 @@ export const WebSocketContext = createContext<WebSocketContextState>(
 );
 
 export const WebSocketProvider: FC<Props> = ({ children, url }) => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const socket = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<WebSocketStatus>(
     WebSocketStatus.Disconnected,
   );
@@ -88,7 +89,7 @@ export const WebSocketProvider: FC<Props> = ({ children, url }) => {
     (hostInfo: ClientMarker) => {
       const ws = new WebSocket(url);
       ws.addEventListener("open", () => {
-        setSocket(ws);
+        socket.current = ws;
         setStatus(WebSocketStatus.Connected);
         ws.send(
           JSON.stringify({
@@ -99,14 +100,14 @@ export const WebSocketProvider: FC<Props> = ({ children, url }) => {
       });
 
       ws.addEventListener("close", () => {
-        setSocket(null);
+        socket.current?.close();
+        socket.current = null;
         setStatus(WebSocketStatus.Disconnected);
       });
 
       ws.addEventListener("message", ({ data: rawMessage }) => {
         try {
           const response = JSON.parse(rawMessage);
-          console.log({ response });
           responseHandler(response);
         } catch (error) {
           const message = (error as any).message ?? error;
@@ -120,14 +121,14 @@ export const WebSocketProvider: FC<Props> = ({ children, url }) => {
   );
 
   const sendMessage = (request: WebSocketRequestMessage) => {
-    if (!socket) {
+    if (!socket.current) {
       return console.error({ error: "Socket not initialized" });
     }
 
     if (status !== WebSocketStatus.Connected) {
       return console.error({ error: "Socket not connected" });
     }
-    socket?.send(JSON.stringify(request));
+    socket.current.send(JSON.stringify(request));
   };
 
   return (
