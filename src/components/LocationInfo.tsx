@@ -1,15 +1,7 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { MapClientsContext } from "@/context/MapClientsContext";
-import { use } from "react";
-export const MarkerInfo = () => {
-  const { hostInfo } = use(MapClientsContext);
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLocationInfo } from "@/hooks/useLocationInfo";
+export const LocationInfo = () => {
+  const { hostInfo } = useLocationInfo();
   return (
     <div className="group/stamp w-full max-w-55  fixed right-3 top-3  p-3 z-50 stamp">
       <div className="p-1 bg-background">
