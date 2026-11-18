@@ -1,7 +1,4 @@
-import {
-  WebSocketContext,
-  WebSocketStatus,
-} from "@/websockets/WebSocketProvider";
+import { MapClientsContext } from "@/context/MapClientsContext";
 import { use, type FC, type ReactNode } from "react";
 import { Navigate } from "react-router";
 
@@ -9,9 +6,9 @@ interface Props {
   element: ReactNode;
 }
 export const PrivateRoute: FC<Props> = ({ element }) => {
-  const { status } = use(WebSocketContext);
+  const { hostInfo } = use(MapClientsContext);
 
-  if (status !== WebSocketStatus.Connected) {
+  if (hostInfo === null) {
     return <Navigate to="/register" />;
   }
   return <>{element}</>;

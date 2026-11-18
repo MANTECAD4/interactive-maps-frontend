@@ -1,7 +1,7 @@
-import { MapClientsContext } from "@/context/MapClientsContext";
 import { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getLocationReverse } from "@/actions/get-location-reverse.action";
+import { MapClientsContext } from "@/context/MapClientsContext";
 export const useLocationInfo = () => {
   const { hostInfo } = use(MapClientsContext);
 
@@ -21,7 +21,7 @@ export const useLocationInfo = () => {
     enabled: hostInfo !== null,
     select: (data) => data.features[0].properties,
   });
-  console.log(locationQuery.data?.full_address);
-  console.log({ error: locationQuery.error });
+  // console.log(locationQuery.data?.full_address);
+  // console.log({ error: locationQuery.error });
   return { hostInfo };
 };

@@ -6,9 +6,8 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { use } from "react";
-import { WebSocketContext } from "@/websockets/WebSocketProvider";
-import { MapClientsContext } from "@/context/MapClientsContext";
 import type { ClientMarker } from "@/dtos";
+import { MapClientsContext } from "@/context/MapClientsContext";
 export const useRegister = () => {
   const {
     register,
@@ -22,8 +21,7 @@ export const useRegister = () => {
     resolver: zodResolver(SubmitClientSchema),
   });
 
-  const { connect } = use(WebSocketContext);
-  const { addHostMarker } = use(MapClientsContext);
+  const { setHostInfo } = use(MapClientsContext);
 
   const handleSubmitForm: SubmitHandler<SubmitRegisterClientDto> = ({
     color,
@@ -38,8 +36,7 @@ export const useRegister = () => {
       color,
       updatedAt: new Date(),
     };
-    addHostMarker(hostInfo);
-    connect(hostInfo);
+    setHostInfo(hostInfo);
   };
   return { register, errors, handleSubmit, handleSubmitForm };
 };

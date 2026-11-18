@@ -11,7 +11,6 @@ export const MapboxMap = () => {
           <SearchBox
             accessToken={import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}
             map={mapRef.current}
-            // @ts-ignore
             mapboxgl={mapboxgl}
             options={{
               proximity: [-103.34583950146607, 20.677395378085805],
