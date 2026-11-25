@@ -21,7 +21,5 @@ export const useLocationInfo = () => {
     enabled: hostInfo !== null,
     select: (data) => data.features[0].properties,
   });
-  // console.log(locationQuery.data?.full_address);
-  // console.log({ error: locationQuery.error });
-  return { hostInfo };
+  return { hostInfo, locationQuery };
 };

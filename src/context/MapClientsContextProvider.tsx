@@ -12,6 +12,7 @@ import {
   WebSocketResponseSchema,
 } from "@/dtos/responses.dtos";
 import z from "zod";
+import { toast } from "@/components/ui/toast";
 
 interface Props {
   websocketUrl: string;
@@ -46,22 +47,23 @@ export const MapClientsContextProvider: FC<Props> = ({
   const createMarker = (
     client: ClientMarker,
     isHost: boolean = false,
-  ): mapboxgl.Marker => {
+  ): mapboxgl.Marker | undefined => {
     if (!mapRef.current) {
-      throw new Error("Map not initialized. marker creation failed");
+      toast.add({ type: "error", description: "Map not initialized" });
+      return;
     }
+    const popup = new mapboxgl.Popup().setHTML(`<h3>${client.name}</h3>`);
+    const marker = new mapboxgl.Marker({
+      color: client.color,
+      draggable: isHost,
+    })
+      .setLngLat([client.coordinates.lon, client.coordinates.lat])
+      .setPopup(popup)
+      .addTo(mapRef.current);
 
     if (isHost) {
-      const popup = new mapboxgl.Popup().setHTML(`<p>${client.name}</p>`);
-      const marker = new mapboxgl.Marker({
-        color: client.color,
-        draggable: true,
-      })
-        .setLngLat([client.coordinates.lon, client.coordinates.lat])
-        .setPopup(popup)
-        .addTo(mapRef.current);
-      marker.on("drag", () => {
-        const { lat, lng: lon } = marker.getLngLat();
+      marker.on("drag", ({ target }) => {
+        const { lat, lng: lon } = target.getLngLat();
         sendMessage({
           type: RequestMessage.MOVE_CLIENT,
           payload: {
@@ -80,16 +82,8 @@ export const MapClientsContextProvider: FC<Props> = ({
           prev ? { ...prev, coordinates: { lat, lon } } : null,
         );
       });
-      return marker;
     }
 
-    const popup = new mapboxgl.Popup().setHTML(`<p>${client.name}</p>`);
-    const marker = new mapboxgl.Marker({
-      color: client.color,
-    })
-      .setLngLat([client.coordinates.lon, client.coordinates.lat])
-      .setPopup(popup)
-      .addTo(mapRef.current);
     return marker;
   };
 
@@ -97,22 +91,19 @@ export const MapClientsContextProvider: FC<Props> = ({
     for (const client of clientMarkers) {
       let marker: mapboxgl.Marker;
       if (client.id === hostInfo!.id) {
-        marker = createMarker(client, true);
+        marker = createMarker(client, true)!;
       } else {
-        marker = createMarker(client);
+        marker = createMarker(client)!;
       }
       clients.current.set(client.id, marker);
     }
   };
 
   const handleAddClient = (client: ClientMarker) => {
-    if (!mapRef.current) {
-      console.error({ error: "Map not initialized" });
-      return;
-    }
-    const marker = createMarker(client);
-    marker.addTo(mapRef.current);
+    const marker = createMarker(client)!;
+    marker.addTo(mapRef.current!);
 
+    toast.add({ type: "info", description: `${client.name} joined 🖖!` });
     clients.current.set(client.id, marker);
   };
 
@@ -123,6 +114,8 @@ export const MapClientsContextProvider: FC<Props> = ({
       return;
     }
     clients.current.delete(id);
+    toast.add({ type: "info", description: `Someone left` });
+
     marker.remove();
   };
 

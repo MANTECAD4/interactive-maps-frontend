@@ -4,6 +4,7 @@ import { SearchBox } from "@mapbox/search-js-react";
 import { useMap } from "@/hooks/useMap";
 export const MapboxMap = () => {
   const { mapContainerRef, mapRef } = useMap();
+
   return (
     <>
       {mapRef.current && (
@@ -28,24 +29,3 @@ export const MapboxMap = () => {
 };
 
 export default MapboxMap;
-{
-  /* <button
-        onClick={() => {
-          handleAddClient(
-            {
-              id: crypto.randomUUID(),
-              name: "nanel",
-              coordinates: {
-                lon: -103.34583950146607,
-                lat: 20.677395378085805,
-              },
-              color: "red",
-              updatedAt: new Date(),
-            },
-            mapRef,
-          );
-        }}
-      >
-        add client
-      </button> */
-}
